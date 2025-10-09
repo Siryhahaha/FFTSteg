@@ -39,25 +39,6 @@ def save_image(path, image):
 		os.makedirs(dir_name)
 	cv2.imwrite(path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
 
-def compress_image(input_path, output_path, quality=85):
-	"""
-	压缩图片
-	:param input_path: 输入图片路径
-	:param output_path: 输出压缩图片路径
-	:param quality: 压缩质量 (1-100)，默认85
-	"""
-	img = cv2.imread(input_path)
-	if img is None:
-		return False
-	if not output_path.lower().endswith(('.png', '.jpg', '.jpeg')):
-		output_path = output_path + '.jpg'
-	dir_name = os.path.dirname(output_path)
-	if dir_name and not os.path.exists(dir_name):
-		os.makedirs(dir_name)
-	cv2.imwrite(output_path, img, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
-	print(f'[INFO]: Image compressed and saved to {output_path}')
-	return True
-
 def encoder(img_path, wm_path, output_path, alpha=10, private_key=None):
 	"""
 	给图片添加水印
@@ -192,27 +173,41 @@ def hash_private_key(key_str):
 		return sum(ord(c) * (i + 1) for i, c in enumerate(key_str))
 	return key_str
 
-def generate_text_watermark(text, size, font_path="msyh.ttc"):
+def generate_text_watermark(text, font_path="msyh.ttc", output_dir="images/wm"):
 	"""
-	生成白底黑字的水印图片
+	生成白底黑字的水印图片，并保存到指定目录
 	:param text: 水印文本
-	:param size: 水印图片的尺寸 (宽, 高)
 	:param font_path: 字体文件路径，默认使用微软雅黑加粗字体
-	:return: 生成的水印图片 (numpy 数组)
+	:param output_dir: 水印图片保存目录
+	:return: 水印图片路径
 	"""
-	width, height = size
-	image = Image.new("RGB", (width, height), "white")
-	draw = ImageDraw.Draw(image)
-	font_size = min(width, height) // 5
+	# 创建保存目录
+	if not os.path.exists(output_dir):
+		os.makedirs(output_dir)
+
+	# 动态计算水印图片尺寸
+	font_size = 50
 	try:
 		font = ImageFont.truetype(font_path, font_size)
 	except OSError:
 		font = ImageFont.load_default()
+
+	# 使用 getbbox 计算文本尺寸
 	if hasattr(font, "getbbox"):
 		text_width, text_height = font.getbbox(text)[2:4]
 	else:
-		text_width, text_height = draw.textsize(text, font=font)
+		text_width, text_height = font.getsize(text)
+	width, height = text_width + 20, text_height + 20  # 添加边距
+
+	# 创建水印图片
+	image = Image.new("RGB", (width, height), "white")
+	draw = ImageDraw.Draw(image)
 	text_x = (width - text_width) // 2
 	text_y = (height - text_height) // 2
 	draw.text((text_x, text_y), text, fill="black", font=font)
-	return cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
+
+	# 保存水印图片
+	filename = f"{text}.png".replace(" ", "_")  # 替换空格为下划线
+	wm_path = os.path.join(output_dir, filename)
+	cv2.imwrite(wm_path, cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY))
+	return wm_path

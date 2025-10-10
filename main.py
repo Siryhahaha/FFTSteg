@@ -19,21 +19,22 @@ def main():
 	parser.add_argument('--re_img', type=str)
 
 	parser.add_argument('--private_key', type=str)
-	parser.add_argument('--wm_text', type=str, default="FFT图片隐写术", help="自定义水印文本")
+	parser.add_argument('--wm_text', type=str, default="FFT图片隐写术")
 	args = parser.parse_args()
 
 	private_key = hash_private_key(args.private_key) if args.private_key else None
 	
+	# 水印图片编码
 	if args.mode == 'img_encode':
 		encode(img_path=args.ori_img, wm_path=args.wm_img, output_path=args.enc_img, private_key=private_key)
-
+	# 文本水印编码
 	elif args.mode == 'txt_encode':
 		wm_path = generate_text_watermark(args.wm_text)
 		encode(img_path=args.ori_img, wm_path=wm_path, output_path=args.enc_img, private_key=private_key)
-
+	# 水印解码
 	elif args.mode == 'decode':
 		decode(img_path=args.enc_img_decode, origin_path=args.ori_img_decode, output_path=args.dwm_img, private_key=private_key)
-	
+	# 原图恢复
 	elif args.mode == 'restore':
 		restore_original(img_path=args.enc_img_restore, wm_path=args.wm_img_restore, output_path=args.re_img, private_key=private_key)
 

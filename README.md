@@ -22,10 +22,10 @@ FFTSteg 是一个基于FFT的图片隐写术工具，支持对图片进行水印
 ## 使用步骤
 
 ### Step 0: 环境配置
-1. 下载并安装 [Miniconda](https://docs.conda.io/en/latest/miniconda.html)。
+1. 下载并安装 [Miniconda3](https://docs.conda.io/en/latest/miniconda.html)。
 2. 使用YML文件创建并激活 `FFTSteg` 环境：
    ```bash
-   conda env create -f FFTSteg.yml
+   conda env create -f asset/FFTSteg.yml
    conda activate FFTSteg
    ```
 
@@ -39,30 +39,10 @@ FFTSteg 是一个基于FFT的图片隐写术工具，支持对图片进行水印
   - `txt_encode`: 使用文本生成水印。
 - `--ori_img`: 原始图片路径（输入）。
 - `--wm_img`: 水印图片路径（输入，仅在 `img_encode` 模式下需要）。
+- `--wm_text`: 自定义水印文本（仅在 `txt_encode` 模式下需要）。
 - `--enc_img`: 编码后图片输出路径。
 - `--private_key`: 私钥（可选），用于加密水印。
-- `--wm_text`: 自定义水印文本（仅在 `txt_encode` 模式下需要）。
-
-#### 标准格式
-1. 使用图片水印：
-   ```bash
-   python main.py \
-       --mode img_encode \
-       --ori_img <原始图片路径> \
-       --wm_img <水印图片路径> \
-       --enc_img <编码图片输出路径> \
-       [--private_key <私钥>]
-   ```
-
-2. 使用文本水印：
-   ```bash
-   python main.py \
-       --mode txt_encode \
-       --ori_img <原始图片路径> \
-       --enc_img <编码图片输出路径> \
-       --wm_text <自定义水印文本> \
-       [--private_key <私钥>]
-   ```
+**当不输入`--wm_img`、`--wm_text`,将使用默认文本参数“FFT图片隐写术”**
 
 #### 示例
 1. 使用图片水印：
@@ -70,8 +50,8 @@ FFTSteg 是一个基于FFT的图片隐写术工具，支持对图片进行水印
    python main.py \
        --mode img_encode \
        --ori_img images/ori/DuXing.png \
-       --wm_img images/wm/RFA.png \
-       --enc_img images/enc/DuXing_RFA_enc.png \
+       --wm_img images/wm/SCUT.png \
+       --enc_img images/enc/DuXing_SCUT_enc.png \
        --private_key siry
    ```
 2. 使用文本水印：
@@ -83,16 +63,6 @@ FFTSteg 是一个基于FFT的图片隐写术工具，支持对图片进行水印
        --wm_text "生如夏花之绚烂" \
        --private_key siry
    ```
-
-3. 自动生成默认文本水印：
-   ```bash
-   python main.py \
-       --mode encode \
-       --ori_img images/ori/test1.png \
-       --enc_img images/enc/test1_wm1_enc.png \
-       --private_key siry
-   ```
-
 ---
 
 ### Step 2: 解码（提取水印）
@@ -104,23 +74,13 @@ FFTSteg 是一个基于FFT的图片隐写术工具，支持对图片进行水印
 - `--dwm_img`: 解码水印输出路径。
 - `--private_key`: 私钥（可选），必须与编码时相同。
 
-#### 标准格式
-```bash
-python main.py \
-    --mode decode \
-    --enc_img_decode <编码图片路径> \
-    --ori_img_decode <原始图片路径> \
-    --dwm_img <解码水印输出路径> \
-    [--private_key <私钥>]
-```
-
 #### 示例
 ```bash
 python main.py \
     --mode decode \
-    --enc_img_decode images/enc/DuXing_RFA_enc.png \
+    --enc_img_decode images/enc/DuXing_SCUT_enc.png \
     --ori_img_decode images/ori/DuXing.png \
-    --dwm_img images/dwm/DuXing_RFA_dwm.png \
+    --dwm_img images/dwm/DuXing_SCUT_dwm.png \
     --private_key siry
 ```
 
@@ -135,23 +95,13 @@ python main.py \
 - `--re_img`: 恢复图片输出路径。
 - `--private_key`: 私钥（可选），必须与编码时相同。
 
-#### 标准格式
-```bash
-python main.py \
-    --mode restore \
-    --enc_img_restore <编码图片路径> \
-    --wm_img_restore <水印图片路径> \
-    --re_img <恢复图片输出路径> \
-    [--private_key <私钥>]
-```
-
 #### 示例
 ```bash
 python main.py \
     --mode restore \
-    --enc_img_restore images/enc/DuXing_RFA_enc.png \
-    --wm_img_restore images/wm/RFA.png \
-    --re_img images/re/DuXing_RFA_re.png \
+    --enc_img_restore images/enc/DuXing_SCUT_enc.png \
+    --wm_img_restore images/wm/SCUT.png \
+    --re_img images/re/DuXing_SCUT_re.png \
     --private_key siry
 ```
 
@@ -163,12 +113,3 @@ python main.py \
 3. **注意事项**:
    - 解码和恢复时必须使用与编码时相同的私钥。
    - 使用错误的私钥会导致水印提取失败或图像严重失真。
-
----
-
-## 注意事项
-1. 水印强度已固定为10，无需手动设置。
-2. 水印图片的尺寸应小于原始图片。
-3. 输出路径可以不包含文件扩展名，系统会自动添加 `.png` 扩展名。
-4. 恢复功能不再需要指定水印强度，系统会自动处理。
-5. 使用错误的私钥进行恢复会导致图像严重失真，这是系统的安全特性。

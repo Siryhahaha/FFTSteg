@@ -10,7 +10,7 @@ def prepare_watermark(img_fft, watermark, alpha, private_key=None):
 	:param img_fft: 图片的频谱数据
 	:param watermark: 水印图片
 	:param alpha: 水印强度
-	:param private_key: 私钥，用于加密水印位置，如果为None则使用图像尺寸作为种子
+	:param private_key: 私钥
 	:return: 嵌入水印后的频谱数据
 	"""
 	height, width, channel = img_fft.shape
@@ -59,7 +59,7 @@ def encode(img_path, wm_path, output_path, private_key=None):
 	:param img_path: 输入图片路径
 	:param wm_path: 水印图片路径
 	:param output_path: 输出图片路径
-	:param private_key: 私钥，用于加密水印
+	:param private_key: 私钥
 	"""
 	alpha = 10
 	if not output_path.lower().endswith(('.png', '.jpg', '.jpeg')):
@@ -71,7 +71,6 @@ def encode(img_path, wm_path, output_path, private_key=None):
 	if watermark is None:
 		return
 	
-	# 检查并调整水印大小
 	watermark = resize_watermark(watermark, img.shape)
 
 	img_fft = np.fft.fft2(img)
@@ -85,7 +84,7 @@ def extract_watermark(watermark, shape, private_key=None):
 	提取水印数据
 	:param watermark: 水印频谱数据
 	:param shape: 原始图片形状
-	:param private_key: 私钥，用于解密水印位置，必须与嵌入时使用的私钥相同
+	:param private_key: 私钥
 	:return: 提取的水印图片
 	"""
 	height, width = shape[0], shape[1]
@@ -107,7 +106,7 @@ def decode(img_path, origin_path, output_path, private_key=None):
 	:param img_path: 输入图片路径
 	:param origin_path: 原始图片路径
 	:param output_path: 输出水印路径
-	:param private_key: 私钥，用于解密水印，必须与嵌入时使用的私钥相同
+	:param private_key: 私钥
 	"""
 	alpha = 10
 	if not output_path.lower().endswith(('.png', '.jpg', '.jpeg')):
@@ -144,7 +143,7 @@ def restore_original(img_path, wm_path, output_path, private_key=None):
 	:param img_path: 带水印的图片路径
 	:param wm_path: 水印图片路径
 	:param output_path: 输出恢复的原始图片路径
-	:param private_key: 私钥，必须与添加水印时使用的相同，否则会导致图像严重失真
+	:param private_key: 私钥
 	"""
 	alpha = 10
 	if not output_path.lower().endswith(('.png', '.jpg', '.jpeg')):
@@ -190,7 +189,7 @@ def generate_text_watermark(text, font_path="asset/msyh.ttc", output_dir="images
 	"""
 	生成白底黑字的水印图片，并保存到指定目录
 	:param text: 水印文本
-	:param font_path: 字体文件路径，默认使用微软雅黑加粗字体
+	:param font_path: 字体文件路径
 	:param output_dir: 水印图片保存目录
 	:param ori_shape: 原始图片形状，用于检查水印大小
 	:return: 水印图片路径
@@ -220,7 +219,6 @@ def generate_text_watermark(text, font_path="asset/msyh.ttc", output_dir="images
 	wm_path = os.path.join(output_dir, filename)
 	watermark = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2GRAY)
 
-	# 检查并调整水印大小
 	if ori_shape is not None:
 		watermark = resize_watermark(watermark, ori_shape)
 

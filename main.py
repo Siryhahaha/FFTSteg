@@ -6,17 +6,17 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--mode', type=str, required=True, choices=['img_encode', 'txt_encode', 'decode', 'restore'])
 
-	parser.add_argument('--ori_img', type=str)
-	parser.add_argument('--wm_img', type=str)
-	parser.add_argument('--enc_img', type=str)
+	parser.add_argument('--ori_img', type=str, default="images/ori/DuXing.png")
+	parser.add_argument('--wm_img', type=str, default="images/wm/SCUT.png")
+	parser.add_argument('--enc_img', type=str, default="images/enc/DuXing_SCUT_enc.png")
 
-	parser.add_argument('--enc_img_decode', type=str)
-	parser.add_argument('--ori_img_decode', type=str)
-	parser.add_argument('--dwm_img', type=str)
+	parser.add_argument('--enc_img_decode', type=str, default="images/enc/DuXing_SCUT_enc.png")
+	parser.add_argument('--ori_img_decode', type=str, default="images/ori/DuXing.png")
+	parser.add_argument('--dwm_img', type=str, default="images/dwm/DuXing_SCUT_dwm.png")
 
-	parser.add_argument('--enc_img_restore', type=str)
-	parser.add_argument('--wm_img_restore', type=str)
-	parser.add_argument('--re_img', type=str)
+	parser.add_argument('--enc_img_restore', type=str, default="images/enc/DuXing_SCUT_enc.png")
+	parser.add_argument('--wm_img_restore', type=str, default="images/wm/SCUT.png")
+	parser.add_argument('--re_img', type=str, default="images/re/DuXing_SCUT_re.png")
 
 	parser.add_argument('--private_key', type=str)
 	parser.add_argument('--wm_text', type=str, default="FFT图片隐写术")
